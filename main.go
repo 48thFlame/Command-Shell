@@ -3,21 +3,21 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 )
 
-func hello(args ArgsType, w io.Writer) error {
-	fmt.Fprintln(w, "yoooo")
+func hello(s *Shell, stdout io.Writer, args []string) error {
+	fmt.Fprintf(stdout, "Args: %v", args)
 
 	return nil
 }
 
 func main() {
-	// cmds := []command{hello}
-	s, err := NewShell(hello)
+	cmds := []Command{NewCommand("hello", 0, hello)}
+	s, err := NewShell(cmds)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-	defer s.Close()
 
 	s.Run()
 }

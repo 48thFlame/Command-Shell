@@ -1,4 +1,4 @@
-module github.com/avitar64/Shell
+module github.com/48thFlame/Shell
 
 go 1.18
 
