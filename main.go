@@ -13,11 +13,14 @@ func hello(s *Shell, stdout io.Writer, args []string) error {
 }
 
 func main() {
-	cmds := []Command{NewCommand("hello", 0, hello)}
+	cmds := []Command{NewCommand("hello", 1, hello)}
 	s, err := NewShell(cmds)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	s.Run()
+	err = s.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
