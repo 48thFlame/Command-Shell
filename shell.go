@@ -9,34 +9,47 @@ import (
 	"github.com/eiannone/keyboard"
 )
 
-// Returns a `Command` type
+// NewCommand returns a `Command` type,
 // Args:
-// `name` - name used to call command
-// `minNumOfArgs` - minimum number of arguments needed for command to run (the `Shell` won't call the command without enough args)
-// `handler` - the handler to call for the command
-func NewCommand(name string, minNumOfArgs int, handler handlerType) Command {
+// 	name // name used to call command
+// 	minNumOfArgs // minimum number of arguments needed for command to run (the `Shell` won't call the command without enough args)
+// 	handler // the handler to call for the command
+func NewCommand(name string, minNumOfArgs int, handler HandlerType) Command {
 	return Command{
-		name:         name,
-		minNumOfArgs: minNumOfArgs,
-		handler:      handler,
+		Name:         name,
+		MinNumOfArgs: minNumOfArgs,
+		Handler:      handler,
 	}
 }
 
-// The command handlerType function type
-// takes in a `*Shell`, `io.Writer`, `[]string` and returns an error
-type handlerType func(shell *Shell, stdout io.Writer, args []string) error
+type CommandHandlerInput struct {
+	Shell  *Shell    // the `Shell` struct
+	Stdout io.Writer // write any command output to here, avoid printing to `os.Stdout`
+	Args   []string  // command-line arguments
+	Cmd    *Command  // the `Command` struct
+}
 
-// The Command type
-// Use `NewCommand` function to create a command
+// HandlerType is the type for
+// 	Command.Handler
+// Its a function called when running its command
+//	*CommandHandlerInput -> error
+type HandlerType func(*CommandHandlerInput) error
+
+// Command type, use
+// 	NewCommand()
+// to create a new Command
 type Command struct {
-	name         string
-	minNumOfArgs int
-	handler      handlerType
+	Name         string      // commands name
+	MinNumOfArgs int         // minium number of arguments needed to run command
+	Handler      HandlerType // the `HandlerType` for this command
 }
 
 // Return a new `Shell` and any `error` that occurred.
 // Takes as input a `[]Command` that the shell should know how to run,
 // Use the `NewCommand` function to create new `Command`s
+
+// NewShell is the constructor for `Shell` type
+//	[]Command -> (*Shell, error)
 func NewShell(cmds []Command) (*Shell, error) {
 	s := &Shell{}
 
@@ -49,25 +62,23 @@ func NewShell(cmds []Command) (*Shell, error) {
 	s.specialKeyChannel = make(chan keyboard.Key)
 	s.quitChannel = make(chan bool, 1)
 
-	exit := NewCommand("exit", 0, func(shell *Shell, stdout io.Writer, args []string) error {
-		fmt.Fprintln(stdout, "Bye bye...")
-		s.quitChannel <- true
+	exit := NewCommand("exit", 0, func(i *CommandHandlerInput) error {
+		i.Shell.quitChannel <- true
 		return nil
 	})
-	s.Path[exit.name] = exit
+	s.Path[exit.Name] = exit
 
 	for _, c := range cmds {
-		if _, exists := s.Path[c.name]; !exists {
-			s.Path[c.name] = c
+		if _, exists := s.Path[c.Name]; !exists {
+			s.Path[c.Name] = c
 		} else { // command with that name already exists
-			return nil, fmt.Errorf("duplicate command name: \"%v\"", c.name)
+			return nil, fmt.Errorf("duplicate command name: \"%v\"", c.Name)
 		}
 	}
 
 	return s, nil
 }
 
-// The `Shell` type
 type Shell struct {
 	Path              map[string]Command // Similar to unix $PATH
 	History           []string           // Similar to unix-terminal history
@@ -77,13 +88,16 @@ type Shell struct {
 	quitChannel       chan bool
 }
 
-// Handle errors by printing the error to the terminal
+// errorHandle handles errors by printing the error to the terminal
 func (s *Shell) errorHandle(err error) {
 	fmt.Println()
 	fmt.Printf("ERROR: %v\n", err)
 }
 
-// Listen for keyboard input and update the `s.currentInput` (user typing) or send the keys to `s.specialKeyChannel`` (Enter, CtrlC etc)
+// listenToKeyboardInput listens for keyboard input and update the
+//	s.currentInput // (user typing)
+// or send the keys to
+//	s.specialKeyChannel // (Enter, CtrlC etc)
 func (s *Shell) listenToKeyboardInput(keysChannel <-chan keyboard.KeyEvent) {
 	for {
 		event := <-keysChannel
@@ -109,25 +123,32 @@ func (s *Shell) listenToKeyboardInput(keysChannel <-chan keyboard.KeyEvent) {
 	}
 }
 
-// Run the command using s.currentInput, return any errors
+// runCommand runs the command at `s.currentInput`, returns any errors
 func (s *Shell) runCommand() error {
 	input := strings.TrimSpace(s.currentInput)
 	args := strings.Split(input, " ")
-	cmdName := args[0]
+	cmdName, args := args[0], args[1:] // pop(0)
 
 	cmd, exists := s.Path[cmdName]
 	if !exists {
 		return fmt.Errorf("command \"%v\" not found", cmdName)
 	}
 
-	numOfArgs := len(args) - 1 // -1 minus the command itself
-	if numOfArgs < cmd.minNumOfArgs {
-		return fmt.Errorf("command \"%v\" needs %v arguments, but %v where provided", cmd.name, cmd.minNumOfArgs, numOfArgs)
+	numOfArgs := len(args) // -1 minus the command itself
+	if numOfArgs < cmd.MinNumOfArgs {
+		return fmt.Errorf("command \"%v\" needs %v arguments, but %v where provided", cmd.Name, cmd.MinNumOfArgs, numOfArgs)
 	}
 
 	cmdStdout := new(strings.Builder)
 
-	err := cmd.handler(s, cmdStdout, args)
+	cmdInput := &CommandHandlerInput{
+		Shell:  s,
+		Stdout: cmdStdout,
+		Args:   args,
+		Cmd:    &cmd,
+	}
+
+	err := cmd.Handler(cmdInput)
 	if err != nil {
 		return err
 	}
@@ -148,7 +169,7 @@ func (s *Shell) runCommand() error {
 	return nil
 }
 
-// Handle a special key (one that isn't plain text, Enter, CtrlC etc)
+// handlerSpecialKey handles a special key (one that isn't plain text, Enter, CtrlC etc)
 func (s *Shell) handleSpecialKey(key keyboard.Key) error {
 	switch key {
 	case keyboard.KeyCtrlC, keyboard.KeyCtrlZ:
@@ -186,7 +207,8 @@ func (s *Shell) mainLoop() {
 	}
 }
 
-// Run the `Shell` return any `error`s, its a blocking function only returns when user exits the `*Shell`
+// Run runs the `Shell` and return any `error`s,
+// its a blocking function only returns when user exits the `Shell` (CtrlC, etc)
 func (s *Shell) Run() error {
 	keyEvents, err := keyboard.GetKeys(1)
 	if err != nil {

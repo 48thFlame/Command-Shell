@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
 )
 
-func hello(s *Shell, stdout io.Writer, args []string) error {
-	fmt.Fprintf(stdout, "Args: %v", args)
+func hello(i *CommandHandlerInput) error {
+	fmt.Fprintf(i.Stdout, "Args: %v", i.Args)
 
 	return nil
 }
