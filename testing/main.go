@@ -1,19 +1,20 @@
 package main
 
 import (
+	"github.com/48thFlame/CommandShell"
 	"fmt"
 	"log"
 )
 
-func hello(i *CommandHandlerInput) error {
+func hello(i *shell.CommandHandlerInput) error {
 	fmt.Fprintf(i.Stdout, "Args: %v", i.Args)
 
 	return nil
 }
 
 func main() {
-	cmds := []Command{NewCommand("hello", 1, hello)}
-	s, err := NewShell(cmds)
+	cmds := []shell.Command{shell.NewCommand("hello", 1, hello)}
+	s, err := shell.NewShell(cmds)
 	if err != nil {
 		log.Fatal(err)
 	}

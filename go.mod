@@ -1,4 +1,4 @@
-module github.com/48thFlame/Shell
+module github.com/48thFlame/CommandShell
 
 go 1.18
 
