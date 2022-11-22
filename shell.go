@@ -50,7 +50,7 @@ type Command struct {
 
 // NewShell is the constructor for `Shell` type
 //	[]Command -> (*Shell, error)
-func NewShell(cmds []Command) (*Shell, error) {
+func NewShell(cmds ...Command) (*Shell, error) {
 	s := &Shell{}
 
 	s.prefix = "> "
