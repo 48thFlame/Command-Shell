@@ -11,9 +11,10 @@ import (
 
 // NewCommand returns a `Command` type,
 // Args:
-// 	name // name used to call command
-// 	minNumOfArgs // minimum number of arguments needed for command to run (the `Shell` won't call the command without enough args)
-// 	handler // the handler to call for the command
+//
+//	name // name used to call command
+//	minNumOfArgs // minimum number of arguments needed for command to run (the `Shell` won't call the command without enough args)
+//	handler // the handler to call for the command
 func NewCommand(name string, minNumOfArgs int, handler HandlerType) Command {
 	return Command{
 		Name:         name,
@@ -30,13 +31,16 @@ type CommandHandlerInput struct {
 }
 
 // HandlerType is the type for
-// 	Command.Handler
+//
+//	Command.Handler
+//
 // Its a function called when running its command
-//	*CommandHandlerInput -> error
 type HandlerType func(*CommandHandlerInput) error
 
 // Command type, use
-// 	NewCommand()
+//
+//	NewCommand()
+//
 // to create a new Command
 type Command struct {
 	Name         string      // commands name
@@ -47,13 +51,11 @@ type Command struct {
 // Return a new `Shell` and any `error` that occurred.
 // Takes as input a `[]Command` that the shell should know how to run,
 // Use the `NewCommand` function to create new `Command`s
-
 // NewShell is the constructor for `Shell` type
-//	[]Command -> (*Shell, error)
 func NewShell(cmds ...Command) (*Shell, error) {
 	s := &Shell{}
 
-	s.prefix = "> "
+	s.LinePrefix = "> "
 	s.currentInput = ""
 
 	s.Path = make(map[string]Command)
@@ -79,10 +81,15 @@ func NewShell(cmds ...Command) (*Shell, error) {
 	return s, nil
 }
 
+// Shell type the main part of the program, use
+//
+//	NewShell()
+//
+// to create a new Shell
 type Shell struct {
 	Path              map[string]Command // Similar to unix $PATH
 	History           []string           // Similar to unix-terminal history
-	prefix            string
+	LinePrefix        string             // Prefix printed at beginning of every command line
 	currentInput      string
 	specialKeyChannel chan keyboard.Key
 	quitChannel       chan bool
@@ -95,8 +102,11 @@ func (s *Shell) errorHandle(err error) {
 }
 
 // listenToKeyboardInput listens for keyboard input and update the
+//
 //	s.currentInput // (user typing)
+//
 // or send the keys to
+//
 //	s.specialKeyChannel // (Enter, CtrlC etc)
 func (s *Shell) listenToKeyboardInput(keysChannel <-chan keyboard.KeyEvent) {
 	for {
@@ -182,14 +192,14 @@ func (s *Shell) handleSpecialKey(key keyboard.Key) error {
 
 func (s *Shell) defaultDisplay() {
 	fmt.Print("\033[2K\r")
-	fmt.Print(s.prefix)
+	fmt.Print(s.LinePrefix)
 	fmt.Print(s.currentInput)
 }
 
 func (s *Shell) mainLoop() {
 	fmt.Println("Enter \"exit\" to quit")
 
-	ticker := time.Tick(100 * time.Millisecond)
+	ticker := time.NewTicker(100 * time.Millisecond)
 	for {
 		select {
 		case <-s.quitChannel:
@@ -203,7 +213,7 @@ func (s *Shell) mainLoop() {
 			s.defaultDisplay()
 		}
 
-		<-ticker
+		<-ticker.C
 	}
 }
 

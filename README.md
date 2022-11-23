@@ -1,7 +1,20 @@
 # Command-shell
 
-A [go](https://go.dev) library for creating simple command-based `tui`'s (terminal user interfaces).
+A go library for creating simple command-based `tui`'s (terminal user interfaces).
 Built on top of this [keyboard package](https://github.com/eiannone/keyboard).
+
+## Features/TODO
+
+- [x] Default `exit` command
+- [x] Minimal number of arguments safety
+- [x] Customizable `LinePrefix`
+- [ ] Commands can store data
+- [ ] Default & automatic `help` command
+- [ ] Up-arrow for previous command
+- [ ] History
+- [ ] Tab autocomplete
+- [ ] Cursor moving around line
+- [ ] And more...
 
 ## Example
 
@@ -36,7 +49,7 @@ func addCommand(input *shell.CommandHandlerInput) error {
         return err
     }
 
-    fmt.Fprintf(input.Stdout, "%v", a+b)
+    fmt.Fprint(input.Stdout, a+b)
 
     return nil
 }
