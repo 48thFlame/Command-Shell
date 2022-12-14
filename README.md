@@ -3,18 +3,21 @@
 A go library for creating simple command-based `tui`'s (terminal user interfaces).
 Built on top of this [keyboard package](https://github.com/eiannone/keyboard).
 
-## Features/TODO
+## Features
 
-- [x] Default `exit` command
-- [x] Minimal number of arguments safety
-- [x] Customizable `LinePrefix`
-- [ ] Commands can store data
-- [ ] Default & automatic `help` command
-- [ ] Up-arrow for previous command
-- [ ] History
-- [ ] Tab autocomplete
-- [ ] Cursor moving around line
-- [ ] And more...
+- Default `exit` command
+- Minimal number of arguments safety
+- Customizable `LinePrefix`
+- Up-arrow for previous command
+- History
+- And more...
+
+## TODO
+
+- Commands can store data
+- Default & automatic `help` command
+- Tab autocomplete
+- Cursor moving around line
 
 ## Example
 
