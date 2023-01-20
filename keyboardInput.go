@@ -35,18 +35,26 @@ func (s *Shell) listenToKeyboardInput(keysChannel <-chan keyboard.KeyEvent) {
 	}
 }
 
+const defaultHistoryIndex = -1
+
 // getInput returns the input that should be displayed
 func (s *Shell) getInput() string {
-	return s.history[s.historyIndex]
+	if s.historyIndex == defaultHistoryIndex {
+		return s.currentInput
+	} else {
+		historyItem := s.history[s.historyIndex]
+		s.currentInput = historyItem
+		return historyItem
+	}
 }
 
 // replaceInput replaces the input that is displayed
 func (s *Shell) replaceInput(newInput string) {
-	if s.historyIndex == 0 {
-		s.history[0] = newInput
+	if s.historyIndex == defaultHistoryIndex {
+		s.currentInput = newInput
 	} else {
-		s.history = prependString(s.history, newInput) // insert at beginning of history
-		s.historyIndex = 0
+		s.currentInput = newInput
+		s.historyIndex = defaultHistoryIndex
 	}
 }
 

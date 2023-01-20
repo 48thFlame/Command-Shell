@@ -62,16 +62,15 @@ func defaultCommands() []*Command {
 }
 
 // runCommand runs the command from input
-// TODO: fix bug when has 2 spaces!!
 // TODO: fix bug when in strange historyIndex place
 func (s *Shell) runCommand() error {
-	input := strings.TrimSpace(s.getInput())
+	args := parsInput(s.getInput())
 
-	if input == "" {
+	if len(args) == 0 {
+		fmt.Println() // Print blank line so put a new >
 		return nil
 	}
 
-	args := strings.Split(input, " ")
 	cmdName, args := args[0], args[1:] // pop(0)
 
 	cmd, exists := s.Path[cmdName]
@@ -110,8 +109,27 @@ func (s *Shell) runCommand() error {
 		}
 	}
 
-	// when done should insert at beginning of history empty slot to be new input
-	s.history = prependString(s.history, "")
+	// // when done should insert at beginning of history empty slot to be new input
+	// s.history = prependString(s.history, "")
 
 	return nil
+}
+
+func parsInput(i string) []string {
+	var args []string
+	input := strings.TrimSpace(i)
+
+	if input == "" {
+		return []string{}
+	}
+
+	argsTemp := strings.Split(input, " ")
+
+	for _, str := range argsTemp {
+		if str != "" {
+			args = append(args, str)
+		}
+	}
+
+	return args
 }

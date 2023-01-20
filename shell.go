@@ -17,8 +17,8 @@ func NewShell(cmds ...*Command) (*Shell, error) {
 	s.LinePrefix = "> "
 
 	s.Path = make(map[string]*Command)
-	s.history = []string{""}
-	s.historyIndex = 0
+	s.history = []string{}
+	s.historyIndex = defaultHistoryIndex
 	s.quitChannel = make(chan bool, 1)
 
 	cmds = append(defaultCommands(), cmds...)
@@ -43,6 +43,7 @@ type Shell struct {
 	Path         map[string]*Command // Similar to unix $PATH
 	history      []string            // Similar to unix-terminal history
 	historyIndex int
+	currentInput string
 	quitChannel  chan bool
 }
 
