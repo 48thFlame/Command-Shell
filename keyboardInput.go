@@ -97,13 +97,14 @@ func (s *Shell) typing(char rune) {
 func (s *Shell) upArrow() {
 	s.historyIndex += 1
 	if s.historyIndex >= len(s.history) {
-		s.historyIndex = 0
+		s.historyIndex = defaultHistoryIndex
+		s.replaceInput("")
 	}
 }
 
 func (s *Shell) downArrow() {
 	s.historyIndex -= 1
-	if s.historyIndex < 0 {
+	if s.historyIndex < defaultHistoryIndex {
 		s.historyIndex = len(s.history) - 1
 	}
 }

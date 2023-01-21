@@ -81,6 +81,14 @@ func (s *Shell) GetHistory() []string {
 	return s.history
 }
 
+// addToHistory add element `i` to beginning of slice `s.history`
+func (s *Shell) addToHistory(i string) {
+	s.history = append(s.history, "")
+	copy(s.history[1:], s.history)
+	s.history[0] = i
+	s.historyIndex = defaultHistoryIndex
+}
+
 // Run runs the `Shell` and return any `error`s,
 // its a blocking function only returns when user exits the `Shell` (CtrlC, etc)
 func (s *Shell) Run() error {

@@ -62,7 +62,6 @@ func defaultCommands() []*Command {
 }
 
 // runCommand runs the command from input
-// TODO: fix bug when in strange historyIndex place
 func (s *Shell) runCommand() error {
 	args := parsInput(s.getInput())
 
@@ -109,8 +108,8 @@ func (s *Shell) runCommand() error {
 		}
 	}
 
-	// // when done should insert at beginning of history empty slot to be new input
-	// s.history = prependString(s.history, "")
+	s.addToHistory(s.getInput())
+	s.replaceInput("")
 
 	return nil
 }
