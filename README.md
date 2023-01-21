@@ -34,15 +34,22 @@ Built on top of this [keyboard package](https://github.com/eiannone/keyboard).
 ```go
 package main
 
+// Imports
 import (
     "fmt"
+    "log"
     "strconv"
 
-    "github.com/48thFlame/Command-shell"
+    shell "github.com/48thFlame/Command-Shell"
 )
 
-func addCommand(input *shell.CommandHandlerInput) error {
+// addCommand represents the `add` command you can see in the output section
+func addCommand(input *shell.CommandInput) error {
     args := input.Args
+
+    // Convert arguments to numbers
+    // can safely assume there will be at lease 2 arguments
+    // we specify this in the `shell.NewCommand` constructor
     a, err := strconv.Atoi(args[0])
     if err != nil {
         return err
@@ -52,8 +59,10 @@ func addCommand(input *shell.CommandHandlerInput) error {
         return err
     }
 
+    // Output the addition
     fmt.Fprint(input.Stdout, a+b)
 
+    // No errors occurred
     return nil
 }
 
