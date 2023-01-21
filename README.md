@@ -7,14 +7,14 @@ Built on top of this [keyboard package](https://github.com/eiannone/keyboard).
 
 - Default `exit` command
 - Minimal number of arguments safety
-- Customizable `LinePrefix`
+- Commands can store data
 - Up-arrow for previous command
 - History
+- Customizable `LinePrefix`
 - And more...
 
 ## TODO
 
-- Commands can store data
 - Default & automatic `help` command
 - Tab autocomplete
 - Cursor moving around line
@@ -34,10 +34,9 @@ Built on top of this [keyboard package](https://github.com/eiannone/keyboard).
 ```go
 package main
 
-// Imports
+// imports
 import (
     "fmt"
-    "log"
     "strconv"
 
     shell "github.com/48thFlame/Command-Shell"
@@ -47,7 +46,7 @@ import (
 func addCommand(input *shell.CommandInput) error {
     args := input.Args
 
-    // Convert arguments to numbers
+    // convert arguments to numbers
     // can safely assume there will be at lease 2 arguments
     // we specify this in the `shell.NewCommand` constructor
     a, err := strconv.Atoi(args[0])
@@ -59,15 +58,30 @@ func addCommand(input *shell.CommandInput) error {
         return err
     }
 
-    // Output the addition
+    // output the addition
     fmt.Fprint(input.Stdout, a+b)
 
-    // No errors occurred
+    // no errors occurred
+    return nil
+}
+
+func timesRanCommand(input *shell.CommandInput) error {
+    // get number of times ran
+    // if doesn't exist the error will be thrown away `_` and val will be the default int -> 0
+    val, _ := input.Cmd.Data["times"].(int)
+
+    // increment `times` by 1
+    input.Cmd.Data["times"] = val + 1
+
+    // output times ran
+    fmt.Fprint(input.Stdout, val)
+
+    // no errors
     return nil
 }
 
 func main() {
-    s, err := shell.NewShell(shell.NewCommand("add", 2, addCommand))
+    s, err := shell.NewShell(shell.NewCommand("add", 2, addCommand), shell.NewCommand("times", 0, timesRanCommand))
     if err != nil {
         panic(err)
     }

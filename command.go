@@ -17,15 +17,16 @@ func NewCommand(name string, minNumOfArgs int, handler HandlerType) *Command {
 		Name:         name,
 		MinNumOfArgs: minNumOfArgs,
 		Handler:      handler,
+		Data:         make(map[string]interface{}),
 	}
 }
 
 // CommandInput is the input type for `CommandHandler` function
 type CommandInput struct {
-	Shell  *Shell    // the `Shell` struct
+	Shell  *Shell    // the `Shell` type
 	Stdout io.Writer // write any command output to here, avoid printing to `os.Stdout`
 	Args   []string  // command-line arguments
-	Cmd    *Command  // the `Command` struct
+	Cmd    *Command  // the `Command` type
 }
 
 // HandlerType is the type for
@@ -41,9 +42,10 @@ type HandlerType func(*CommandInput) error
 //
 // to create a new Command
 type Command struct {
-	Name         string      // commands name
-	MinNumOfArgs int         // minium number of arguments needed to run command
-	Handler      HandlerType // the `HandlerType` for this command
+	Name         string                 // commands name
+	MinNumOfArgs int                    // minium number of arguments needed to run command
+	Handler      HandlerType            // the `HandlerType` for this command
+	Data         map[string]interface{} // data
 }
 
 func defaultCommands() []*Command {
