@@ -96,3 +96,7 @@ func main() {
 }
 
 ```
+
+## Install
+
+`go get https://pkg.go.dev/github.com/48thFlame/Command-Shell`
