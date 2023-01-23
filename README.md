@@ -10,12 +10,12 @@ Built on top of this [keyboard package](https://github.com/eiannone/keyboard).
 - Commands can store data
 - Up-arrow for previous command
 - History
+- Default & automatic `help` command
 - Customizable `LinePrefix`
 - And more...
 
 ## TODO
 
-- Default & automatic `help` command
 - Tab autocomplete
 - Cursor moving around line
 

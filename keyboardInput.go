@@ -103,8 +103,12 @@ func (s *Shell) upArrow() {
 }
 
 func (s *Shell) downArrow() {
-	s.historyIndex -= 1
-	if s.historyIndex < defaultHistoryIndex {
+	if s.historyIndex == defaultHistoryIndex {
 		s.historyIndex = len(s.history) - 1
+	} else if s.historyIndex == 0 {
+		s.historyIndex = defaultHistoryIndex
+		s.replaceInput("")
+	} else {
+		s.historyIndex -= 1
 	}
 }

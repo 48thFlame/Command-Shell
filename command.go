@@ -55,12 +55,23 @@ func defaultCommands() []*Command {
 	})
 
 	var historyCommand = NewCommand("history", 0, func(ci *CommandInput) error {
-		// TODO: make prettyprint
-		fmt.Fprint(ci.Stdout, ci.Shell.GetHistory())
+		fmt.Fprint(ci.Stdout, strings.Join(ci.Shell.GetHistory(), ", "))
 		return nil
 	})
 
-	return []*Command{exitCommand, historyCommand}
+	var helpCommand = NewCommand("help", 0, func(ci *CommandInput) error {
+		cmds := make([]string, len(ci.Shell.Path))
+		i := 0
+		for k := range ci.Shell.Path {
+			cmds[i] = k
+			i++
+		}
+
+		fmt.Fprint(ci.Stdout, strings.Join(cmds, ", "))
+		return nil
+	})
+
+	return []*Command{exitCommand, historyCommand, helpCommand}
 }
 
 // runCommand runs the command from input
