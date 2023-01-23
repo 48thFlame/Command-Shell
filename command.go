@@ -45,7 +45,7 @@ type Command struct {
 	Name         string                 // commands name
 	MinNumOfArgs int                    // minium number of arguments needed to run command
 	Handler      HandlerType            // the `HandlerType` for this command
-	Data         map[string]interface{} // data
+	Data         map[string]interface{} // data stored for the command
 }
 
 func defaultCommands() []*Command {

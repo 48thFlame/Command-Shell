@@ -81,7 +81,10 @@ func timesRanCommand(input *shell.CommandInput) error {
 }
 
 func main() {
-    s, err := shell.NewShell(shell.NewCommand("add", 2, addCommand), shell.NewCommand("times", 0, timesRanCommand))
+    s, err := shell.NewShell(
+        shell.NewCommand("add", 2, addCommand),
+        shell.NewCommand("times", 0, timesRanCommand),
+    )
     if err != nil {
         panic(err)
     }
@@ -91,4 +94,5 @@ func main() {
         panic(err)
     }
 }
+
 ```
